@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Termux Monitor - YussXy Monitor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0f0f0f;
+            --bg-secondary: #1a1a1a;
+            --bg-card: #1e1e1e;
+            --text-primary: #ffffff;
+            --text-secondary: #9ca3af;
+            --accent: #ef4444;
+            --accent-hover: #dc2626;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --border: #2a2a2a;
+            --radius-sm: 12px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .app-container {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background: var(--bg-primary);
+            position: relative;
+            padding-bottom: 70px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 16px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-img {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .logo-text {
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+        .logo-text span {
+            color: var(--accent);
+        }
+
+        .header-icons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .icon-btn {
+            background: rgba(255,255,255,0.05);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-btn:active {
+            transform: scale(0.95);
+        }
+
+        .main-content {
+            padding: 20px 16px;
+            min-height: calc(100vh - 130px);
+        }
+
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .page-header h2 {
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .page-header h2 i {
+            font-size: 28px;
+            color: var(--accent);
+        }
+
+        .page-header p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 6px;
+        }
+
+        .connection-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .connection-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .status-connected {
+            background: rgba(16,185,129,0.15);
+            color: var(--success);
+        }
+
+        .status-disconnected {
+            background: rgba(239,68,68,0.15);
+            color: var(--danger);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-danger {
+            background: rgba(239,68,68,0.2);
+            color: var(--danger);
+            border: 1px solid rgba(239,68,68,0.3);
+        }
+
+        .btn-success {
+            background: rgba(16,185,129,0.2);
+            color: var(--success);
+            border: 1px solid rgba(16,185,129,0.3);
+        }
+
+        .btn-warning {
+            background: rgba(245,158,11,0.2);
+            color: var(--warning);
+            border: 1px solid rgba(245,158,11,0.3);
+        }
+
+        /* GRID 3 KOLOM */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            padding: 14px 8px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .stat-card:active {
+            transform: scale(0.98);
+        }
+
+        .stat-icon {
+            font-size: 24px;
+            color: var(--accent);
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+
+        .stat-unit {
+            font-size: 9px;
+            color: var(--text-secondary);
+            margin-left: 2px;
+        }
+
+        .battery-low {
+            color: var(--danger);
+        }
+
+        .info-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .info-card h4 {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-card h4 i {
+            color: var(--accent);
+        }
+
+        .log-content {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            height: 180px;
+            overflow-y: auto;
+            font-size: 11px;
+            font-family: monospace;
+        }
+
+        .log-entry {
+            padding: 6px 0;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+
+        .log-time {
+            color: var(--accent);
+            margin-right: 8px;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            max-width: 480px;
+            margin: 0 auto;
+            background: var(--bg-secondary);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        .nav-item {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        .nav-item i {
+            font-size: 22px;
+        }
+
+        .nav-item.active {
+            color: var(--accent);
+        }
+
+        .nav-item:active {
+            transform: scale(0.95);
+        }
+
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <div class="logo-area">
+                <div class="logo-img">
+                    <i class="ri-device-line"></i>
+                </div>
+                <div class="logo-text">YussXy<span>Monitor</span></div>
+            </div>
+            <div class="header-icons">
+                <div class="icon-btn" onclick="refreshData()">
+                    <i class="ri-refresh-line"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="page-header">
+                <h2>
+                    <i class="ri-smartphone-line"></i>
+                    Termux Monitor
+                </h2>
+                <p>Real-time monitoring HP via Termux API</p>
+            </div>
+
+            <div class="connection-card">
+                <div id="connectionStatus" class="connection-status status-disconnected">
+                    <i class="ri-plug-line"></i> ● Disconnected
+                </div>
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="connectToTermux()">
+                        <i class="ri-wifi-line"></i> Connect
+                    </button>
+                    <button class="btn btn-danger" onclick="disconnectFromTermux()">
+                        <i class="ri-close-line"></i> Disconnect
+                    </button>
+                    <button class="btn btn-warning" onclick="testNotification()">
+                        <i class="ri-notification-line"></i> Test
+                    </button>
+                </div>
+            </div>
+
+            <!-- GRID 3 KOLOM -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="ri-battery-charge-line"></i></div>
+                    <div class="stat-label">Battery</div>
+                    <div class="stat-value" id="batteryLevel">--<span class="stat-unit">%</span></div>
+                    <div id="batteryStatus" style="font-size: 9px; margin-top: 4px; color: var(--text-secondary);"></div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="ri-wifi-line"></i></div>
+                    <div class="stat-label">Network</div>
+                    <div class="stat-value" id="networkType" style="font-size: 14px;">--</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="ri-signal-tower-line"></i></div>
+                    <div class="stat-label">Signal</div>
+                    <div class="stat-value" id="signalStrength">--<span class="stat-unit">dBm</span></div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="ri-hard-drive-line"></i></div>
+                    <div class="stat-label">Storage</div>
+                    <div class="stat-value" id="storageAvailable" style="font-size: 14px;">--</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="ri-cpu-line"></i></div>
+                    <div class="stat-label">RAM Usage</div>
+                    <div class="stat-value" id="ramUsage">--<span class="stat-unit">%</span></div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="ri-temperature-line"></i></div>
+                    <div class="stat-label">CPU Temp</div>
+                    <div class="stat-value" id="cpuTemp">--<span class="stat-unit">°C</span></div>
+                </div>
+            </div>
+
+            <!-- INFO CARD EXTRA -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="ri-smartphone-line"></i></div>
+                    <div class="stat-label">Device</div>
+                    <div class="stat-value" id="deviceModel" style="font-size: 11px;">--</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="ri-memory-card-line"></i></div>
+                    <div class="stat-label">RAM Total</div>
+                    <div class="stat-value" id="ramTotal" style="font-size: 14px;">--</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="ri-cloud-line"></i></div>
+                    <div class="stat-label">IP Address</div>
+                    <div class="stat-value" id="ipAddress" style="font-size: 10px;">--</div>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <h4><i class="ri-history-line"></i> Monitoring Log</h4>
+                <div class="log-content" id="logContent">
+                    <div class="log-entry"><span class="log-time">[System]</span> Ready - click Connect to start</div>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <h4><i class="ri-information-line"></i> Info Penting</h4>
+                <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.5;">
+                    • Pastikan Termux server berjalan di port 8081<br>
+                    • HP dan PC/laptop dalam 1 jaringan WiFi<br>
+                    • Data otomatis refresh setiap 5 detik
+                </p>
+            </div>
+        </div>
+
+        <div class="bottom-nav">
+            <div class="nav-item active">
+                <i class="ri-device-line"></i>
+                <span>Monitor</span>
+            </div>
+            <div class="nav-item" onclick="refreshData()">
+                <i class="ri-refresh-line"></i>
+                <span>Refresh</span>
+            </div>
+            <div class="nav-item" onclick="testNotification()">
+                <i class="ri-notification-line"></i>
+                <span>Test</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let ws = null;
+        let reconnectAttempts = 0;
+        const maxReconnectAttempts = 5;
+
+        function addLog(message) {
+            const logDiv = document.getElementById('logContent');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            logEntry.innerHTML = `<span class="log-time">[${timestamp}]</span> ${message}`;
+            logDiv.appendChild(logEntry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+            
+            while (logDiv.children.length > 100) {
+                logDiv.removeChild(logDiv.firstChild);
+            }
+        }
+
+        function updateConnectionStatus(connected) {
+            const statusDiv = document.getElementById('connectionStatus');
+            if (connected) {
+                statusDiv.className = 'connection-status status-connected';
+                statusDiv.innerHTML = '<i class="ri-checkbox-circle-line"></i> ● Connected to Termux';
+                addLog('✅ Connected to Termux API');
+            } else {
+                statusDiv.className = 'connection-status status-disconnected';
+                statusDiv.innerHTML = '<i class="ri-plug-line"></i> ● Disconnected';
+                addLog('❌ Disconnected from Termux API');
+            }
+        }
+
+        function connectToTermux() {
+            const wsPort = 8081;
+            const wsUrl = `ws://${window.location.hostname}:${wsPort}`;
+            
+            addLog(`🔄 Connecting to ${wsUrl}...`);
+            
+            try {
+                ws = new WebSocket(wsUrl);
+                
+                ws.onopen = function() {
+                    updateConnectionStatus(true);
+                    reconnectAttempts = 0;
+                    sendCommand('get_info');
+                };
+                
+                ws.onmessage = function(event) {
+                    handleTermuxData(event.data);
+                };
+                
+                ws.onerror = function(error) {
+                    addLog(`⚠️ WebSocket error`);
+                    updateConnectionStatus(false);
+                };
+                
+                ws.onclose = function() {
+                    updateConnectionStatus(false);
+                    attemptReconnect();
+                };
+            } catch (error) {
+                addLog(`❌ Connection failed: ${error.message}`);
+                addLog('💡 Pastikan server Termux berjalan di port 8081');
+            }
+        }
+        
+        function attemptReconnect() {
+            if (reconnectAttempts < maxReconnectAttempts) {
+                reconnectAttempts++;
+                addLog(`🔄 Reconnect attempt ${reconnectAttempts}/${maxReconnectAttempts} in 3s...`);
+                setTimeout(() => {
+                    connectToTermux();
+                }, 3000);
+            } else {
+                addLog('❌ Max reconnection attempts. Please reconnect manually.');
+            }
+        }
+        
+        function disconnectFromTermux() {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.close();
+            }
+            updateConnectionStatus(false);
+        }
+        
+        function sendCommand(command) {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ command: command }));
+            } else {
+                addLog('⚠️ Not connected to Termux');
+            }
+        }
+        
+        function handleTermuxData(data) {
+            try {
+                const parsedData = JSON.parse(data);
+                updateUI(parsedData);
+            } catch (e) {
+                addLog(`📨 Received: ${data.substring(0, 50)}`);
+            }
+        }
+        
+        function updateUI(data) {
+            if (data.battery !== undefined) {
+                const batteryElem = document.getElementById('batteryLevel');
+                batteryElem.innerHTML = `${data.battery}<span class="stat-unit">%</span>`;
+                if (data.battery < 20) {
+                    batteryElem.classList.add('battery-low');
+                } else {
+                    batteryElem.classList.remove('battery-low');
+                }
+                
+                if (data.battery_status) {
+                    document.getElementById('batteryStatus').innerHTML = data.battery_status;
+                }
+            }
+            
+            if (data.network_type) {
+                document.getElementById('networkType').innerHTML = data.network_type;
+            }
+            
+            if (data.signal_strength) {
+                document.getElementById('signalStrength').innerHTML = `${data.signal_strength}<span class="stat-unit">dBm</span>`;
+            }
+            
+            if (data.storage_available) {
+                document.getElementById('storageAvailable').innerHTML = data.storage_available;
+            }
+            
+            if (data.ram_usage) {
+                document.getElementById('ramUsage').innerHTML = `${data.ram_usage}<span class="stat-unit">%</span>`;
+            }
+            
+            if (data.cpu_temp) {
+                document.getElementById('cpuTemp').innerHTML = `${data.cpu_temp}<span class="stat-unit">°C</span>`;
+            }
+            
+            if (data.device_model) {
+                let model = data.device_model;
+                if (model.length > 12) model = model.substring(0, 10) + '..';
+                document.getElementById('deviceModel').innerHTML = model;
+            }
+            
+            if (data.ram_total) {
+                document.getElementById('ramTotal').innerHTML = data.ram_total;
+            }
+            
+            if (data.ip_address) {
+                document.getElementById('ipAddress').innerHTML = data.ip_address;
+            }
+        }
+        
+        function refreshData() {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                sendCommand('refresh');
+                addLog('🔄 Manual refresh');
+            } else {
+                addLog('⚠️ Not connected - cannot refresh');
+            }
+        }
+        
+        function testNotification() {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                sendCommand('notify');
+                addLog('🔔 Test notification sent');
+            } else {
+                addLog('⚠️ Not connected - cannot send notification');
+            }
+        }
+        
+        setInterval(() => {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                sendCommand('get_info');
+            }
+        }, 5000);
+        
+        addLog('💡 Web interface ready. Click Connect to start monitoring.');
+        addLog('📝 Pastikan server Termux berjalan di port 8081');
+    </script>
+</body>
+</html>
