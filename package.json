@@ -1,0 +1,13 @@
+{
+  "name": "termux-monitor",
+  "version": "1.0.0",
+  "description": "Termux Monitor Full Control",
+  "scripts": {
+    "install": "pkg update -y && pkg upgrade -y && pkg install python -y && pkg install python-pip -y && pkg install termux-api -y && pip install websockets",
+    "start": "python termux_server.py"
+  },
+  "dependencies": {
+    "python": "3.13",
+    "websockets": "latest"
+  }
+}
